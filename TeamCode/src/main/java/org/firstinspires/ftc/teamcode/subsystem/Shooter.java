@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
+import org.firstinspires.ftc.teamcode.constraints.ShooterConstraints;
+
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
 import dev.nextftc.core.commands.Command;
@@ -10,21 +12,29 @@ import dev.nextftc.hardware.impl.MotorEx;
 
 public class Shooter implements Subsystem {
     public static final Shooter INSTANCE = new Shooter();
+    public boolean shouldStop = true;
+    public double getVelocityTarget() {
+        return ShooterConstraints.shooterGoal;
+    }
     private Shooter() { }
 
-    private final MotorEx motor = new MotorEx("shooter1");
+    private final MotorEx motor1 = new MotorEx("shooter1").reversed();
+    private final MotorEx motor2 = new MotorEx("shooter2");
 
     private final ControlSystem controlSystem = ControlSystem.builder()
-            .velPid(0.005)
+            .basicFF(0.001)
+            .velPid(0.0005)
             .build();
 
     public Command spinUp = new InstantCommand(() -> {
-        controlSystem.setGoal(new KineticState(Double.MAX_VALUE, 2000, Double.MAX_VALUE));
+        controlSystem.setGoal(new KineticState(Double.MAX_VALUE, getVelocityTarget(), Double.MAX_VALUE));
+        shouldStop = false;
         //motor.setPower(1);
     });
 
     public Command spinDown = new InstantCommand(() -> {
         controlSystem.setGoal(new KineticState(Double.MAX_VALUE, 0, Double.MAX_VALUE));
+        shouldStop = true;
         //motor.setPower(0);
     });
 
@@ -34,10 +44,21 @@ public class Shooter implements Subsystem {
 
     @Override
     public void periodic() {
-        motor.setPower(controlSystem.calculate(motor.getState()));
-        ActiveOpMode.telemetry().addData("shooter1 ticks/s", motor.getVelocity());
-        ActiveOpMode.telemetry().addData("shooter1 rpm", ticksToRPM(motor.getVelocity(), 28));
-        ActiveOpMode.telemetry().addData("cs power", motor.getPower());
-        ActiveOpMode.telemetry().addData("shooter1 target", controlSystem.getGoal());
+        double power = controlSystem.calculate(motor1.getState());
+
+        if (shouldStop) {
+            motor1.setPower(0);
+            motor2.setPower(0);
+        } else {
+            motor1.setPower(power);
+            motor2.setPower(power);
+        }
+        ActiveOpMode.telemetry().addData("shooter1 ticks/s", motor1.getVelocity());
+        ActiveOpMode.telemetry().addData("shooter1 rpm", ticksToRPM(motor1.getVelocity(), 28));
+        ActiveOpMode.telemetry().addData("shooter2 ticks/s", motor2.getVelocity());
+        ActiveOpMode.telemetry().addData("shooter2 rpm", ticksToRPM(motor2.getVelocity(), 28));
+        ActiveOpMode.telemetry().addData("cs power", power);
+        ActiveOpMode.telemetry().addData("cs goal", controlSystem.getGoal());
+        ActiveOpMode.telemetry().addData("shouldStop", shouldStop);
     }
 }

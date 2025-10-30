@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.subsystem.Shooter;
 
 import dev.nextftc.core.commands.Command;
@@ -21,7 +22,7 @@ import dev.nextftc.hardware.impl.MotorEx;
 public class TestTeleop extends NextFTCOpMode {
     public TestTeleop() {
         addComponents(
-                new SubsystemComponent(Shooter.INSTANCE),
+                new SubsystemComponent(Shooter.INSTANCE, Intake.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
         );
@@ -56,9 +57,25 @@ public class TestTeleop extends NextFTCOpMode {
                     Shooter.INSTANCE.spinDown.schedule();
                 });
 
-        Gamepads.gamepad1().triangle()
+        Gamepads.gamepad1().dpadLeft()
                 .whenBecomesTrue(() -> {
                     imu.zero();
+                });
+
+        Gamepads.gamepad1().leftBumper()
+                .whenBecomesTrue(() -> {
+                    Intake.INSTANCE.spinUp.schedule();
+                })
+                .whenBecomesFalse(() -> {
+                    Intake.INSTANCE.spinDown.schedule();
+                });
+
+        Gamepads.gamepad1().rightBumper()
+                .whenBecomesTrue(() -> {
+                    Intake.INSTANCE.transferUp.schedule();
+                })
+                .whenBecomesFalse(() -> {
+                    Intake.INSTANCE.transferDown.schedule();
                 });
     }
 
