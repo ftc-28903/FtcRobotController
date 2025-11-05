@@ -1,7 +1,9 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.RobotLog;
 
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.subsystem.Shooter;
 
@@ -35,6 +37,9 @@ public class TestTeleop extends NextFTCOpMode {
     private final MotorEx backRightMotor = new MotorEx("back_right").reversed();
     private final IMUEx imu = new IMUEx("imu", Direction.RIGHT, Direction.UP).zeroed();
 
+    private boolean slowMode = false;
+    private double slowModeMultiplier = 0.25;
+
     @Override
     public void onStartButtonPressed() {
         Command driverControlled = new MecanumDriverControlled(
@@ -49,7 +54,7 @@ public class TestTeleop extends NextFTCOpMode {
         );
         driverControlled.schedule();
 
-        Gamepads.gamepad1().circle().toggleOnBecomesTrue()
+        Gamepads.gamepad1().x().toggleOnBecomesTrue()
                 .whenBecomesTrue(() -> {
                     Shooter.INSTANCE.spinUp.schedule();
                 })
@@ -57,12 +62,36 @@ public class TestTeleop extends NextFTCOpMode {
                     Shooter.INSTANCE.spinDown.schedule();
                 });
 
+        Gamepads.gamepad1().triangle().toggleOnBecomesTrue()
+                .whenBecomesTrue(() -> {
+                    Gamepads.gamepad1().leftStickY().map(y -> y * slowModeMultiplier);
+                    Gamepads.gamepad1().leftStickX().map(x -> x * slowModeMultiplier);
+                    Gamepads.gamepad1().rightStickX().map(x -> x * slowModeMultiplier);
+                            slowMode = true;
+                })
+                .whenBecomesFalse(() -> {
+                    Gamepads.gamepad1().leftStickY().map(y -> y);
+                    Gamepads.gamepad1().leftStickX().map(x -> x);
+                    Gamepads.gamepad1().rightStickX().map(x -> x);
+                    slowMode = false;
+                });
+
+        Gamepads.gamepad1().dpadUp()
+                        .whenBecomesTrue(() -> {
+                            slowModeMultiplier += 0.05;
+                        });
+
+        Gamepads.gamepad1().dpadDown()
+                        .whenBecomesTrue(() -> {
+                            slowModeMultiplier -= 0.05;
+                        });
+
         Gamepads.gamepad1().dpadLeft()
                 .whenBecomesTrue(() -> {
                     imu.zero();
                 });
 
-        Gamepads.gamepad1().leftBumper()
+        Gamepads.gamepad1().leftBumper().toggleOnBecomesTrue()
                 .whenBecomesTrue(() -> {
                     Intake.INSTANCE.spinUp.schedule();
                 })
@@ -77,6 +106,18 @@ public class TestTeleop extends NextFTCOpMode {
                 .whenBecomesFalse(() -> {
                     Intake.INSTANCE.transferDown.schedule();
                 });
+
+        ActiveOpMode.telemetry().addData("slowMode toggle", slowMode);
+        ActiveOpMode.telemetry().addData("slowMode multiplier", slowModeMultiplier);
+
+        RobotLog.d("Motor Amp: Left Front Drive: " + frontLeftMotor.getMotor().getCurrent(CurrentUnit.AMPS));
+        RobotLog.d("Motor Amp: Left Back Drive: " + backLeftMotor.getMotor().getCurrent(CurrentUnit.AMPS));
+        RobotLog.d("Motor Amp: Right Front Drive: " + frontRightMotor.getMotor().getCurrent(CurrentUnit.AMPS));
+        RobotLog.d("Motor Amp: Right Back Drive: " + backRightMotor.getMotor().getCurrent(CurrentUnit.AMPS));
+
+        RobotLog.d("Motor Amp: Intake Motor: " + Intake.INSTANCE.motor1.getMotor().getCurrent(CurrentUnit.AMPS));
+        RobotLog.d("Motor Amp: Shooter Motor 1: " + Shooter.INSTANCE.motor1.getMotor().getCurrent(CurrentUnit.AMPS));
+        RobotLog.d("Motor Amp: Shooter Motor 2: " + Shooter.INSTANCE.motor2.getMotor().getCurrent(CurrentUnit.AMPS));
     }
 
     @Override

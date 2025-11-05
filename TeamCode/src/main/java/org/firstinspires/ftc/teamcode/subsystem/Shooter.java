@@ -18,12 +18,12 @@ public class Shooter implements Subsystem {
     }
     private Shooter() { }
 
-    private final MotorEx motor1 = new MotorEx("shooter1").reversed();
-    private final MotorEx motor2 = new MotorEx("shooter2");
+    public final MotorEx motor1 = new MotorEx("shooter1").reversed();
+    public final MotorEx motor2 = new MotorEx("shooter2");
 
     private final ControlSystem controlSystem = ControlSystem.builder()
-            .basicFF(0.001)
-            .velPid(0.0005)
+            .basicFF(ShooterConstraints.feedforwardParameters)
+            .velPid(ShooterConstraints.pidCoefficients)
             .build();
 
     public Command spinUp = new InstantCommand(() -> {
@@ -33,8 +33,8 @@ public class Shooter implements Subsystem {
     });
 
     public Command spinDown = new InstantCommand(() -> {
-        controlSystem.setGoal(new KineticState(Double.MAX_VALUE, 0, Double.MAX_VALUE));
         shouldStop = true;
+        controlSystem.setGoal(new KineticState(Double.MAX_VALUE, 0, Double.MAX_VALUE));
         //motor.setPower(0);
     });
 
