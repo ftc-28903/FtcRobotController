@@ -1,15 +1,18 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
-import org.firstinspires.ftc.teamcode.constraints.ShooterConstants;
+import com.bylazar.configurables.annotations.Configurable;
 
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
+import dev.nextftc.control.feedback.PIDCoefficients;
+import dev.nextftc.control.feedforward.BasicFeedforwardParameters;
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.utility.InstantCommand;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.hardware.impl.MotorEx;
 
+@Configurable
 public class Shooter implements Subsystem {
     public static final Shooter INSTANCE = new Shooter();
     public boolean shouldStop = true;
@@ -18,13 +21,17 @@ public class Shooter implements Subsystem {
     public final MotorEx motor1 = new MotorEx("shooter1").reversed();
     public final MotorEx motor2 = new MotorEx("shooter2");
 
+    public static double shooterGoal = 2500;
+    public static BasicFeedforwardParameters feedforwardParameters = new BasicFeedforwardParameters(0.001,0,0);
+    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.0005, 0, 0);
+
     private final ControlSystem controlSystem = ControlSystem.builder()
-            .basicFF(ShooterConstants.feedforwardParameters)
-            .velPid(ShooterConstants.pidCoefficients)
+            .basicFF(feedforwardParameters)
+            .velPid(pidCoefficients)
             .build();
 
     public Command spinUp = new InstantCommand(() -> {
-        controlSystem.setGoal(new KineticState(Double.MAX_VALUE, ShooterConstants.shooterGoal, Double.MAX_VALUE));
+        controlSystem.setGoal(new KineticState(Double.MAX_VALUE, shooterGoal, Double.MAX_VALUE));
         shouldStop = false;
         //motor.setPower(1);
     });
