@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.opmodes.teleop;
 
+import com.bylazar.telemetry.PanelsTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.RobotLog;
 
@@ -37,6 +38,8 @@ public class TestTeleop extends NextFTCOpMode {
     private final MotorEx backRightMotor = new MotorEx("back_right").reversed();
     private final IMUEx imu = new IMUEx("imu", Direction.RIGHT, Direction.UP).zeroed();
 
+    private final PanelsTelemetry panelsTelemetry = PanelsTelemetry.INSTANCE;
+
     private boolean slowMode = false;
     private double slowModeMultiplier = 0.25;
 
@@ -54,7 +57,7 @@ public class TestTeleop extends NextFTCOpMode {
         );
         driverControlled.schedule();
 
-        Gamepads.gamepad1().x().toggleOnBecomesTrue()
+        Gamepads.gamepad1().cross().toggleOnBecomesTrue()
                 .whenBecomesTrue(() -> {
                     Shooter.INSTANCE.spinUp.schedule();
                 })
@@ -118,6 +121,8 @@ public class TestTeleop extends NextFTCOpMode {
         RobotLog.d("Motor Amp: Intake Motor: " + Intake.INSTANCE.motor1.getMotor().getCurrent(CurrentUnit.AMPS));
         RobotLog.d("Motor Amp: Shooter Motor 1: " + Shooter.INSTANCE.motor1.getMotor().getCurrent(CurrentUnit.AMPS));
         RobotLog.d("Motor Amp: Shooter Motor 2: " + Shooter.INSTANCE.motor2.getMotor().getCurrent(CurrentUnit.AMPS));
+
+        panelsTelemetry.getTelemetry().update(telemetry);
     }
 
     @Override
