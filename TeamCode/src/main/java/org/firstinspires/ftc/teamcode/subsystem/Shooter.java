@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
-import org.firstinspires.ftc.teamcode.constraints.ShooterConstraints;
+import org.firstinspires.ftc.teamcode.constraints.ShooterConstants;
 
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
@@ -13,21 +13,18 @@ import dev.nextftc.hardware.impl.MotorEx;
 public class Shooter implements Subsystem {
     public static final Shooter INSTANCE = new Shooter();
     public boolean shouldStop = true;
-    public double getVelocityTarget() {
-        return ShooterConstraints.shooterGoal;
-    }
     private Shooter() { }
 
     public final MotorEx motor1 = new MotorEx("shooter1").reversed();
     public final MotorEx motor2 = new MotorEx("shooter2");
 
     private final ControlSystem controlSystem = ControlSystem.builder()
-            .basicFF(ShooterConstraints.feedforwardParameters)
-            .velPid(ShooterConstraints.pidCoefficients)
+            .basicFF(ShooterConstants.feedforwardParameters)
+            .velPid(ShooterConstants.pidCoefficients)
             .build();
 
     public Command spinUp = new InstantCommand(() -> {
-        controlSystem.setGoal(new KineticState(Double.MAX_VALUE, getVelocityTarget(), Double.MAX_VALUE));
+        controlSystem.setGoal(new KineticState(Double.MAX_VALUE, ShooterConstants.shooterGoal, Double.MAX_VALUE));
         shouldStop = false;
         //motor.setPower(1);
     });
