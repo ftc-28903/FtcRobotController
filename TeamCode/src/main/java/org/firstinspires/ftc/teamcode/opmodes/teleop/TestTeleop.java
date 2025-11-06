@@ -81,12 +81,16 @@ public class TestTeleop extends NextFTCOpMode {
 
         Gamepads.gamepad1().dpadUp()
                         .whenBecomesTrue(() -> {
-                            slowModeMultiplier += 0.05;
+                            if (slowModeMultiplier+0.05 <= 1) {
+                                slowModeMultiplier += 0.05;
+                            }
                         });
 
         Gamepads.gamepad1().dpadDown()
                         .whenBecomesTrue(() -> {
-                            slowModeMultiplier -= 0.05;
+                            if (slowModeMultiplier-0.05 > 0) {
+                                slowModeMultiplier -= 0.05;
+                            }
                         });
 
         Gamepads.gamepad1().dpadLeft()
