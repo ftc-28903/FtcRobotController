@@ -36,7 +36,7 @@ public class TestTeleop extends NextFTCOpMode {
     private final MotorEx frontRightMotor = new MotorEx("front_right").reversed();
     private final MotorEx backLeftMotor = new MotorEx("back_left");
     private final MotorEx backRightMotor = new MotorEx("back_right").reversed();
-    private final IMUEx imu = new IMUEx("imu", Direction.RIGHT, Direction.UP).zeroed();
+    private final IMUEx imu = new IMUEx("imu", Direction.LEFT, Direction.UP).zeroed();
 
     private final PanelsTelemetry panelsTelemetry = PanelsTelemetry.INSTANCE;
 
@@ -70,7 +70,7 @@ public class TestTeleop extends NextFTCOpMode {
                     Gamepads.gamepad1().leftStickY().map(y -> y * slowModeMultiplier);
                     Gamepads.gamepad1().leftStickX().map(x -> x * slowModeMultiplier);
                     Gamepads.gamepad1().rightStickX().map(x -> x * slowModeMultiplier);
-                            slowMode = true;
+                    slowMode = true;
                 })
                 .whenBecomesFalse(() -> {
                     Gamepads.gamepad1().leftStickY().map(y -> y);
@@ -113,9 +113,13 @@ public class TestTeleop extends NextFTCOpMode {
                 .whenBecomesFalse(() -> {
                     Intake.INSTANCE.transferDown.schedule();
                 });
+    }
 
+    @Override
+    public void onUpdate() {
         ActiveOpMode.telemetry().addData("slowMode toggle", slowMode);
         ActiveOpMode.telemetry().addData("slowMode multiplier", slowModeMultiplier);
+        ActiveOpMode.telemetry().update();
 
         RobotLog.d("Motor Amp: Left Front Drive: " + frontLeftMotor.getMotor().getCurrent(CurrentUnit.AMPS));
         RobotLog.d("Motor Amp: Left Back Drive: " + backLeftMotor.getMotor().getCurrent(CurrentUnit.AMPS));
@@ -127,10 +131,5 @@ public class TestTeleop extends NextFTCOpMode {
         RobotLog.d("Motor Amp: Shooter Motor 2: " + Shooter.INSTANCE.motor2.getMotor().getCurrent(CurrentUnit.AMPS));
 
         panelsTelemetry.getTelemetry().update(telemetry);
-    }
-
-    @Override
-    public void onUpdate() {
-        ActiveOpMode.telemetry().update();
     }
 }

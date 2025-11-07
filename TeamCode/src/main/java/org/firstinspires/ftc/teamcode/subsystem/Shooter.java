@@ -14,16 +14,15 @@ import dev.nextftc.hardware.impl.MotorEx;
 
 @Configurable
 public class Shooter implements Subsystem {
-    public static final Shooter INSTANCE = new Shooter();
     public boolean shouldStop = true;
     private Shooter() { }
 
     public final MotorEx motor1 = new MotorEx("shooter1").reversed();
     public final MotorEx motor2 = new MotorEx("shooter2");
 
-    public static double shooterGoal = 2500;
-    public static BasicFeedforwardParameters feedforwardParameters = new BasicFeedforwardParameters(0.001,0,0);
-    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.0005, 0, 0);
+    public static double shooterGoal = 1350;
+    public static BasicFeedforwardParameters feedforwardParameters = new BasicFeedforwardParameters(0,0,0);
+    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.0003, 0, 0);
 
     private final ControlSystem controlSystem = ControlSystem.builder()
             .basicFF(feedforwardParameters)
@@ -42,6 +41,7 @@ public class Shooter implements Subsystem {
         //motor.setPower(0);
     });
 
+    // ticksPerSecond = RPM x 28 / 60
     public double ticksToRPM(double ticksPerSecond, double countsPerRevolution) {
         return (ticksPerSecond / countsPerRevolution * 60);
     }
@@ -54,6 +54,7 @@ public class Shooter implements Subsystem {
             motor1.setPower(0);
             motor2.setPower(0);
         } else {
+            controlSystem.setGoal(new KineticState(Double.MAX_VALUE, shooterGoal, Double.MAX_VALUE));
             motor1.setPower(power);
             motor2.setPower(power);
         }
@@ -65,4 +66,6 @@ public class Shooter implements Subsystem {
         ActiveOpMode.telemetry().addData("cs goal", controlSystem.getGoal());
         ActiveOpMode.telemetry().addData("shouldStop", shouldStop);
     }
+
+    public static final Shooter INSTANCE = new Shooter();
 }
