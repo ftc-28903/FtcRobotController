@@ -21,8 +21,8 @@ public class Shooter implements Subsystem {
     public final MotorEx motor2 = new MotorEx("shooter2");
 
     public static double shooterGoal = 1350;
-    public static BasicFeedforwardParameters feedforwardParameters = new BasicFeedforwardParameters(0,0,0);
-    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.0003, 0, 0);
+    public static BasicFeedforwardParameters feedforwardParameters = new BasicFeedforwardParameters(0.3,0.1910,0.3680);
+    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.002, 0, 0.00001);
 
     private final ControlSystem controlSystem = ControlSystem.builder()
             .basicFF(feedforwardParameters)
