@@ -49,70 +49,40 @@ public class TestTeleop extends NextFTCOpMode {
                 frontLeftMotor,
                 frontRightMotor,
                 backLeftMotor,
-                backRightMotor,
-                Gamepads.gamepad1().leftStickY().negate(),
-                Gamepads.gamepad1().leftStickX(),
-                Gamepads.gamepad1().rightStickX(),
+                backRightMotor, // .map(x -> slowMode ? Math.copySign(Math.pow(Math.abs(x), 1.5), x) * slowModeMultiplier : x)
+                Gamepads.gamepad1().leftStickY().negate().map(y -> slowMode ? y * slowModeMultiplier : y),
+                Gamepads.gamepad1().leftStickX().map(x -> slowMode ? x * slowModeMultiplier : x),
+                Gamepads.gamepad1().rightStickX().map(x -> slowMode ? x * slowModeMultiplier : x),
                 new FieldCentric(imu)
         );
         driverControlled.schedule();
 
         Gamepads.gamepad1().cross().toggleOnBecomesTrue()
-                .whenBecomesTrue(() -> {
-                    Shooter.INSTANCE.spinUp.schedule();
-                })
-                .whenBecomesFalse(() -> {
-                    Shooter.INSTANCE.spinDown.schedule();
-                });
+                .whenBecomesTrue(() -> Shooter.INSTANCE.spinUp.schedule())
+                .whenBecomesFalse(() -> Shooter.INSTANCE.spinDown.schedule());
 
         Gamepads.gamepad1().triangle().toggleOnBecomesTrue()
-                .whenBecomesTrue(() -> {
-                    Gamepads.gamepad1().leftStickY().map(y -> y * slowModeMultiplier);
-                    Gamepads.gamepad1().leftStickX().map(x -> x * slowModeMultiplier);
-                    Gamepads.gamepad1().rightStickX().map(x -> x * slowModeMultiplier);
-                    slowMode = true;
-                })
-                .whenBecomesFalse(() -> {
-                    Gamepads.gamepad1().leftStickY().map(y -> y);
-                    Gamepads.gamepad1().leftStickX().map(x -> x);
-                    Gamepads.gamepad1().rightStickX().map(x -> x);
-                    slowMode = false;
-                });
+                .whenBecomesTrue(() -> slowMode = true)
+                .whenBecomesFalse(() -> slowMode = false);
 
         Gamepads.gamepad1().dpadUp()
-                        .whenBecomesTrue(() -> {
-                            if (slowModeMultiplier+0.05 <= 1) {
-                                slowModeMultiplier += 0.05;
-                            }
-                        });
+                        .whenBecomesTrue(() ->
+                                slowModeMultiplier = Math.min(1, slowModeMultiplier+0.05));
 
         Gamepads.gamepad1().dpadDown()
-                        .whenBecomesTrue(() -> {
-                            if (slowModeMultiplier-0.05 > 0) {
-                                slowModeMultiplier -= 0.05;
-                            }
-                        });
+                        .whenBecomesTrue(() ->
+                                slowModeMultiplier = Math.max(0.05, slowModeMultiplier-0.05));
 
         Gamepads.gamepad1().dpadLeft()
-                .whenBecomesTrue(() -> {
-                    imu.zero();
-                });
+                .whenBecomesTrue(imu::zero);
 
         Gamepads.gamepad1().leftBumper().toggleOnBecomesTrue()
-                .whenBecomesTrue(() -> {
-                    Intake.INSTANCE.spinUp.schedule();
-                })
-                .whenBecomesFalse(() -> {
-                    Intake.INSTANCE.spinDown.schedule();
-                });
+                .whenBecomesTrue(() -> Intake.INSTANCE.spinUp.schedule())
+                .whenBecomesFalse(() -> Intake.INSTANCE.spinDown.schedule());
 
         Gamepads.gamepad1().rightBumper()
-                .whenBecomesTrue(() -> {
-                    Intake.INSTANCE.transferUp.schedule();
-                })
-                .whenBecomesFalse(() -> {
-                    Intake.INSTANCE.transferDown.schedule();
-                });
+                .whenBecomesTrue(() -> Intake.INSTANCE.transferUp.schedule())
+                .whenBecomesFalse(() -> Intake.INSTANCE.transferDown.schedule());
     }
 
     @Override
