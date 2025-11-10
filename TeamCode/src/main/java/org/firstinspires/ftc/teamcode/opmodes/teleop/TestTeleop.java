@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.subsystem.Shooter;
+import org.firstinspires.ftc.teamcode.subsystem.Transfer;
+import org.firstinspires.ftc.teamcode.subsystem.Webcam;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.components.BindingsComponent;
@@ -25,7 +27,7 @@ import dev.nextftc.hardware.impl.MotorEx;
 public class TestTeleop extends NextFTCOpMode {
     public TestTeleop() {
         addComponents(
-                new SubsystemComponent(Shooter.INSTANCE, Intake.INSTANCE),
+                new SubsystemComponent(Shooter.INSTANCE, Intake.INSTANCE, Transfer.INSTANCE, Webcam.INSTANCE),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
         );
@@ -81,8 +83,11 @@ public class TestTeleop extends NextFTCOpMode {
                 .whenBecomesFalse(() -> Intake.INSTANCE.spinDown.schedule());
 
         Gamepads.gamepad1().rightBumper()
-                .whenBecomesTrue(() -> Intake.INSTANCE.transferUp.schedule())
-                .whenBecomesFalse(() -> Intake.INSTANCE.transferDown.schedule());
+                .whenBecomesTrue(() -> Transfer.INSTANCE.cycleOverrideState.schedule());
+
+        Gamepads.gamepad1().start().toggleOnBecomesTrue()
+                .whenBecomesTrue(() -> Transfer.INSTANCE.overrideOn.schedule())
+                .whenBecomesFalse(() -> Transfer.INSTANCE.overrideOff.schedule());
     }
 
     @Override

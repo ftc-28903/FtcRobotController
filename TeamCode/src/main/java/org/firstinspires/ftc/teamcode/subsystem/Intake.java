@@ -14,9 +14,6 @@ public class Intake implements Subsystem {
     private Intake() {}
 
     public final MotorEx motor1 = new MotorEx("intake").reversed();
-    private final CRServoEx servo1 = new CRServoEx("servo1"); // bottom transfer
-    private final CRServoEx servo2 = new CRServoEx("servo2"); // top transfer (to shooter)
-    private final PowerableGroup crservogroup = new PowerableGroup(servo1, servo2);
 
     public Command spinUp = new InstantCommand(() -> {
         motor1.setPower(1);
@@ -25,17 +22,4 @@ public class Intake implements Subsystem {
     public Command spinDown = new InstantCommand(() -> {
         motor1.setPower(0);
     });
-
-    public Command transferUp = new InstantCommand(() -> {
-        crservogroup.setPower(1);
-    });
-
-    public Command transferDown = new InstantCommand(() -> {
-        crservogroup.setPower(0);
-    });
-
-    @Override
-    public void initialize() {
-        servo1.getServo().setDirection(DcMotorSimple.Direction.REVERSE);
-    }
 }
