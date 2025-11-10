@@ -32,9 +32,7 @@ public class Transfer implements Subsystem {
     public Command shootModeOn = new InstantCommand(() -> targetDistance = 5);
     public Command shootModeOff = new InstantCommand(() -> targetDistance = 8);
 
-    public Command cycleOverrideState = new InstantCommand(() -> {
-        manualOverrideState = (manualOverrideState == 2) ? 0 : manualOverrideState + 1;
-    });
+    public Command cycleOverrideState = new InstantCommand(() -> manualOverrideState = (manualOverrideState == 2) ? 0 : manualOverrideState + 1);
 
     private int stateToSpeed(int state) {
         // made this way to be clearer

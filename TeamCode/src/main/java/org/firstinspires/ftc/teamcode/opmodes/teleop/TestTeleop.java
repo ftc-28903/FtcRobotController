@@ -88,6 +88,10 @@ public class TestTeleop extends NextFTCOpMode {
         Gamepads.gamepad1().start().toggleOnBecomesTrue()
                 .whenBecomesTrue(() -> Transfer.INSTANCE.overrideOn.schedule())
                 .whenBecomesFalse(() -> Transfer.INSTANCE.overrideOff.schedule());
+
+        Gamepads.gamepad1().leftTrigger().greaterThan(0.2)
+                .whenBecomesTrue(() -> Transfer.INSTANCE.shootModeOn.schedule())
+                .whenBecomesFalse(() -> Transfer.INSTANCE.shootModeOff.schedule());
     }
 
     @Override
