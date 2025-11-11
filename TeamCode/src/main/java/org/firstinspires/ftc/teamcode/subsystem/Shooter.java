@@ -20,9 +20,9 @@ public class Shooter implements Subsystem {
     public final MotorEx motor1 = new MotorEx("shooter1").reversed();
     public final MotorEx motor2 = new MotorEx("shooter2");
 
-    public static double shooterGoal = 1350;
-    public static BasicFeedforwardParameters feedforwardParameters = new BasicFeedforwardParameters(0.3,0.1910,0.3680);
-    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.002, 0, 0.00001);
+    public static double shooterGoal = 1550;
+    public static BasicFeedforwardParameters feedforwardParameters = new BasicFeedforwardParameters(0.00027, 0.0, 0.0);
+    public static PIDCoefficients pidCoefficients = new PIDCoefficients(0.000165, 0, 0.0);
 
     private final ControlSystem controlSystem = ControlSystem.builder()
             .basicFF(feedforwardParameters)

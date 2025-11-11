@@ -17,9 +17,6 @@ import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.ftc.ActiveOpMode;
 
 public class Webcam implements Subsystem {
-    public static final Webcam INSTANCE = new Webcam();
-    private Webcam() { }
-
     private AprilTagProcessor aprilTagProcessor;
     private VisionPortal visionPortal;
     private List<AprilTagDetection> detectedTags = new ArrayList<>();
@@ -76,4 +73,7 @@ public class Webcam implements Subsystem {
         }
         return null;
     }
+
+    public static final Webcam INSTANCE = new Webcam();
+    private Webcam() { }
 }

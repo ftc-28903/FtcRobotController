@@ -57,7 +57,7 @@ public class Transfer implements Subsystem {
     @Override
     public void periodic() {
         if (!manualOverride) {
-            crServoGroup.setPower(revColorSensor.getDistance(DistanceUnit.CM) < targetDistance ? 1 : 0);
+            crServoGroup.setPower(revColorSensor.getDistance(DistanceUnit.CM) > targetDistance ? 1 : 0);
         } else {
             crServoGroup.setPower(stateToSpeed(manualOverrideState));
         }
