@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.subsystem;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.bylazar.telemetry.PanelsTelemetry;
+import com.bylazar.telemetry.TelemetryManager;
 
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
@@ -11,6 +13,7 @@ import dev.nextftc.core.commands.utility.InstantCommand;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.ftc.ActiveOpMode;
 import dev.nextftc.hardware.impl.MotorEx;
+import dev.nextftc.hardware.impl.ServoEx;
 
 @Configurable
 public class Shooter implements Subsystem {
@@ -19,6 +22,7 @@ public class Shooter implements Subsystem {
 
     public final MotorEx motor1 = new MotorEx("shooter1").reversed();
     public final MotorEx motor2 = new MotorEx("shooter2");
+    public final ServoEx hoodServo1 = new ServoEx("hoodServo1");
 
     public static double shooterGoal = 1550;
     public static BasicFeedforwardParameters feedforwardParameters = new BasicFeedforwardParameters(0.00027, 0.0, 0.0);
@@ -41,9 +45,20 @@ public class Shooter implements Subsystem {
         //motor.setPower(0);
     });
 
+    public Command hoodTest = new InstantCommand(() -> {
+        hoodServo1.setPosition(0.5);
+    });
+
+    private TelemetryManager telemetryM;
+
     // ticksPerSecond = RPM x 28 / 60
     public double ticksToRPM(double ticksPerSecond, double countsPerRevolution) {
         return (ticksPerSecond / countsPerRevolution * 60);
+    }
+
+    @Override
+    public void initialize() {
+        telemetryM = PanelsTelemetry.INSTANCE.getTelemetry();
     }
 
     @Override
@@ -58,13 +73,15 @@ public class Shooter implements Subsystem {
             motor1.setPower(power);
             motor2.setPower(power);
         }
-        ActiveOpMode.telemetry().addData("shooter1 ticks/s", motor1.getVelocity());
-        ActiveOpMode.telemetry().addData("shooter1 rpm", ticksToRPM(motor1.getVelocity(), 28));
-        ActiveOpMode.telemetry().addData("shooter2 ticks/s", motor2.getVelocity());
-        ActiveOpMode.telemetry().addData("shooter2 rpm", ticksToRPM(motor2.getVelocity(), 28));
-        ActiveOpMode.telemetry().addData("cs power", power);
-        ActiveOpMode.telemetry().addData("cs goal", controlSystem.getGoal());
-        ActiveOpMode.telemetry().addData("shouldStop", shouldStop);
+        telemetryM.addData("shooter1 ticks/s", motor1.getVelocity());
+        telemetryM.addData("shooter1 rpm", ticksToRPM(motor1.getVelocity(), 28));
+        telemetryM.addData("shooter2 ticks/s", motor2.getVelocity());
+        telemetryM.addData("shooter2 rpm", ticksToRPM(motor2.getVelocity(), 28));
+        telemetryM.addData("shooter power", power);
+        telemetryM.addData("shouldStop", shouldStop);
+
+        telemetryM.addData("shooterTargetVelocity", controlSystem.getGoal().getVelocity());
+        telemetryM.addData("shooterVelocity", motor1.getVelocity());
     }
 
     public static final Shooter INSTANCE = new Shooter();

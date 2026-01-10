@@ -11,6 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.subsystem.Intake;
 import org.firstinspires.ftc.teamcode.subsystem.Shooter;
+import org.firstinspires.ftc.teamcode.subsystem.Webcam;
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.components.BindingsComponent;
@@ -31,14 +32,9 @@ public class MecanumTest extends NextFTCOpMode {
         addComponents(
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
-                new SubsystemComponent(Shooter.INSTANCE)
+                new SubsystemComponent(Shooter.INSTANCE, Intake.INSTANCE)
         );
     }
-
-    private final MotorEx frontLeftMotor = new MotorEx("front_left");
-    private final MotorEx frontRightMotor = new MotorEx("front_right").reversed();
-    private final MotorEx backLeftMotor = new MotorEx("back_left");
-    private final MotorEx backRightMotor = new MotorEx("back_right").reversed();
 
     private TelemetryManager telemetryM;
 
@@ -78,12 +74,18 @@ public class MecanumTest extends NextFTCOpMode {
         Gamepads.gamepad1().rightTrigger().greaterThan(0.2)
                 .whenBecomesTrue(() -> Shooter.INSTANCE.spinUp.schedule())
                 .whenBecomesFalse(() -> Shooter.INSTANCE.spinDown.schedule());
+
+        Gamepads.gamepad1().leftTrigger().greaterThan(0.2)
+                .whenBecomesTrue(() -> Intake.INSTANCE.spinUp.schedule())
+                .whenBecomesFalse(() -> Intake.INSTANCE.spinDown.schedule());
+
+        Gamepads.gamepad1().a()
+                .whenBecomesTrue(() -> Shooter.INSTANCE.hoodTest.schedule());
     }
 
     @Override
     public void onUpdate() {
         follower.update();
-        telemetryM.update(telemetry);
 
         if (!slowMode) follower.setTeleOpDrive(
                 -gamepad1.left_stick_y,
@@ -103,5 +105,7 @@ public class MecanumTest extends NextFTCOpMode {
 
         telemetryM.debug("position", follower.getPose());
         telemetryM.debug("velocity", follower.getVelocity());
+
+        telemetryM.update(telemetry);
     }
 }

@@ -33,7 +33,7 @@ android {
 
     // panels start
     //noinspection GradleDependency
-    compileSdk 35
+    compileSdk 34
     defaultConfig {
         minSdk 24
     }
@@ -57,8 +57,4 @@ dependencies {
     implementation 'dev.nextftc:hardware:1.0.1' // If you would like to use the hardware module
 
     implementation 'dev.frozenmilk.sinister:Sloth:0.2.4'
-
-    implementation "com.bylazar:fullpanels:1.0.12"
-    implementation 'com.pedropathing:ftc:2.0.5'
-    implementation 'com.pedropathing:telemetry:1.0.0'
 }
